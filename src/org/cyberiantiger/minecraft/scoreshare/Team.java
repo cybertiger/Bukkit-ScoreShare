@@ -39,6 +39,10 @@ public final class Team {
         this.members.addAll(members);
     }
 
+    public void addMember(OfflinePlayer player) {
+        this.members.add(player);
+    }
+
     public String getPrefix() {
         return prefix;
     }
@@ -77,5 +81,8 @@ public final class Team {
         team.setSuffix(suffix);
         team.setAllowFriendlyFire(friendlyFire);
         team.setCanSeeFriendlyInvisibles(seeInvisibleFriendlies);
+        for (OfflinePlayer p : members) {
+            team.addPlayer(p);
+        }
     }
 }

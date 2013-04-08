@@ -18,7 +18,7 @@ import org.bukkit.scoreboard.Criterias;
  *
  * @author antony
  */
-public class HealthProvider extends AbstractObjectiveProvider<ScoreShare> implements ObjectiveProviderFactory<ScoreShare>, Listener {
+class HealthProvider extends AbstractObjectiveProvider<ScoreShare> implements ObjectiveProviderFactory<ScoreShare>, Listener {
 
     public HealthProvider(ScoreShare plugin) {
         super(plugin, "health", "Health", Criterias.HEALTH);
