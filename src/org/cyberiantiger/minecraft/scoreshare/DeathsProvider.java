@@ -4,6 +4,9 @@
  */
 package org.cyberiantiger.minecraft.scoreshare;
 
+import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProviderFactory;
+import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProvider;
+import org.cyberiantiger.minecraft.scoreshare.api.AbstractObjectiveProvider;
 import java.util.Collections;
 import java.util.Map;
 import org.bukkit.OfflinePlayer;

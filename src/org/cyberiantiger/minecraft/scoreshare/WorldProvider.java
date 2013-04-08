@@ -4,6 +4,10 @@
  */
 package org.cyberiantiger.minecraft.scoreshare;
 
+import org.cyberiantiger.minecraft.scoreshare.api.TeamProviderFactory;
+import org.cyberiantiger.minecraft.scoreshare.api.TeamProvider;
+import org.cyberiantiger.minecraft.scoreshare.api.Team;
+import org.cyberiantiger.minecraft.scoreshare.api.AbstractTeamProvider;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

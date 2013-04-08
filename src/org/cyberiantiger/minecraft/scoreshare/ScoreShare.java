@@ -4,6 +4,13 @@
  */
 package org.cyberiantiger.minecraft.scoreshare;
 
+import org.cyberiantiger.minecraft.scoreshare.api.TeamProviderListener;
+import org.cyberiantiger.minecraft.scoreshare.api.TeamProviderFactory;
+import org.cyberiantiger.minecraft.scoreshare.api.TeamProvider;
+import org.cyberiantiger.minecraft.scoreshare.api.Team;
+import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProviderListener;
+import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProviderFactory;
+import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +55,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         // Register our own providers.
         ServicesManager manager = getServer().getServicesManager();
         manager.register(ObjectiveProviderFactory.class, new HealthProvider(this), this, ServicePriority.Normal);
+        manager.register(ObjectiveProviderFactory.class, new ServerStatsProvider(this), this, ServicePriority.Normal);
         manager.register(TeamProviderFactory.class, new WorldProvider(this), this, ServicePriority.Normal);
 
         // This should run after all other plugins are loaded even for a /reload
@@ -322,7 +330,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
             if (teamProvider != null) {
                 for (Team team : teamProvider.getTeams()) {
                     org.bukkit.scoreboard.Team bukkitTeam = scoreboard.registerNewTeam(team.getName());
-                    team.apply(bukkitTeam);
+                    copy(team, bukkitTeam);
                 }
                 teamProvider.addListener(teamProviderListener);
                 this.teamProvider = teamProvider;
@@ -464,6 +472,17 @@ public class ScoreShare extends JavaPlugin implements Listener {
                     team.removePlayer(member);
                 }
             }
+        }
+    }
+
+    private static void copy(org.cyberiantiger.minecraft.scoreshare.api.Team myTeam, org.bukkit.scoreboard.Team team) {
+        team.setDisplayName(myTeam.getDisplayName());
+        team.setPrefix(myTeam.getPrefix());
+        team.setSuffix(myTeam.getSuffix());
+        team.setAllowFriendlyFire(myTeam.isFriendlyFire());
+        team.setCanSeeFriendlyInvisibles(myTeam.isSeeInvisibleFriendlies());
+        for (OfflinePlayer p : myTeam.getMembers()) {
+            team.addPlayer(p);
         }
     }
 }
