@@ -1,0 +1,9 @@
+name: "ScoreShare"
+version: "1.0"
+main: "org.cyberiantiger.minecraft.scoreshare.ScoreShare"
+load: STARTUP
+commands:
+  scoreshare:
+    description: Manipulate the shared scoreboard.
+    usage: /<command> info | teams <team provider> | sidebar <objective provider> | nametag <objective provider> | list <objective provider>
+    permission: scoreshare.player.modify
