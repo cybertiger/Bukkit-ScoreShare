@@ -121,6 +121,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         saveDefaultConfig();
         // Register our own providers.
         ServicesManager manager = getServer().getServicesManager();
+        manager.register(ScoreShareAPI.class, getAPI(), this, ServicePriority.Normal);
         manager.register(ObjectiveProviderFactory.class, new HealthProvider(this), this, ServicePriority.Normal);
         manager.register(ObjectiveProviderFactory.class, new ServerStatsProvider(this), this, ServicePriority.Normal);
         manager.register(TeamProviderFactory.class, new WorldProvider(this), this, ServicePriority.Normal);
@@ -298,7 +299,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent e) {
-        scoreboards.put(e.getPlayer(), new PlayerScoreboard(e.getPlayer()));
+        reset(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
