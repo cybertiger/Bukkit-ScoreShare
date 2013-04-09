@@ -36,22 +36,89 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.cyberiantiger.minecraft.scoreshare.api.ScoreShareAPI;
+import org.cyberiantiger.minecraft.scoreshare.unsafe.CBShim;
+import org.cyberiantiger.minecraft.scoreshare.unsafe.ScoreModifier;
 
 /**
- * 
- * 
+ *
+ *
  * @author antony
  */
 public class ScoreShare extends JavaPlugin implements Listener {
 
-    private Map<Player, PlayerScoreboard> scoreboards = new WeakHashMap<Player, PlayerScoreboard>();
+    private final boolean bukkitSucks = true;
 
+    private Map<Player, PlayerScoreboard> scoreboards = new WeakHashMap<Player, PlayerScoreboard>();
     private List<ObjectiveProviderFactory<Plugin>> objectiveProviderFactories;
     private List<TeamProviderFactory<Plugin>> teamProviderFactories;
+    private final ScoreShareAPI api = new ScoreShareAPI() {
+        @Override
+        public void reset() {
+            ScoreShare.this.reset();
+        }
+
+        @Override
+        public void reset(Player player) {
+            ScoreShare.this.reset(player);
+        }
+
+        @Override
+        public void setTeamProvider(Plugin source, String name) {
+            for (Player p : getServer().getOnlinePlayers()) {
+                setTeamProvider(p, source, name);
+            }
+        }
+
+        @Override
+        public void setTeamProvider(Player player, Plugin source, String name) {
+            PlayerScoreboard scoreboard = scoreboards.get(player);
+            scoreboard.setTeamProvider(scoreboard.getTeamProvider(source, name));
+        }
+
+        @Override
+        public void setObjectiveProvider(DisplaySlot slot, Plugin source, String name) {
+            for (Player p : getServer().getOnlinePlayers()) {
+                setObjectiveProvider(p, slot, source, name);
+            }
+        }
+
+        @Override
+        public void setObjectiveProvider(Player player, DisplaySlot slot, Plugin source, String name) {
+            PlayerScoreboard scoreboard = scoreboards.get(player);
+            scoreboard.setDisplayObjectiveProvider(slot, scoreboard.getObjectiveProvider(source, name));
+        }
+    };
+
+    public ScoreShareAPI getAPI() {
+        return api;
+    }
+
+    private void reset() {
+        for (Player p : getServer().getOnlinePlayers()) {
+            reset(p);
+        }
+    }
+
+    private void reset(Player player) {
+        PlayerScoreboard scoreboard = new PlayerScoreboard(player);
+        scoreboards.put(player, scoreboard);
+        if (getConfig().isString("defaults.teams")) {
+            TeamProvider<Plugin> t = scoreboard.getTeamProvider(getConfig().getString("defaults.teams"));
+            scoreboard.setTeamProvider(t);
+        }
+        for (DisplaySlot slot : DisplaySlot.values()) {
+            if (getConfig().isString("defaults." + slot.toString().toLowerCase())) {
+                ObjectiveProvider<Plugin> o = scoreboard.getObjectiveProvider(getConfig().getString("defaults." + slot.toString().toLowerCase()));
+                scoreboard.setDisplayObjectiveProvider(slot, o);
+            }
+        }
+    }
 
     @Override
     public void onEnable() {
         super.onEnable();
+        saveDefaultConfig();
         // Register our own providers.
         ServicesManager manager = getServer().getServicesManager();
         manager.register(ObjectiveProviderFactory.class, new HealthProvider(this), this, ServicePriority.Normal);
@@ -62,9 +129,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         getServer().getScheduler().runTask(this, new Runnable() {
             @Override
             public void run() {
-                for (Player p : getServer().getOnlinePlayers()) {
-                    scoreboards.put(p, new PlayerScoreboard(p));
-                }
+                reset();
                 getServer().getPluginManager().registerEvents(ScoreShare.this, ScoreShare.this);
             }
         });
@@ -88,7 +153,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
             // Usage
             return false;
         }
-        if ( ! (sender instanceof Player) ) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage("Only players have Scoreboards");
             return true;
         }
@@ -143,7 +208,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 }
             }
             scoreboard.setTeamProvider(teamProvider);
-        } else if ("nametag".equalsIgnoreCase(args[0])) {
+        } else if ("belowname".equalsIgnoreCase(args[0])) {
             if (args.length != 2) {
                 return false;
             }
@@ -188,6 +253,45 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 }
             }
             scoreboard.setDisplayObjectiveProvider(DisplaySlot.PLAYER_LIST, objectiveProvider);
+        } else if ("savedefault".equalsIgnoreCase(args[0])) {
+            if (args.length != 1) {
+                return false;
+            }
+            if (!sender.hasPermission("scoreshare.savedefault")) {
+                sender.sendMessage("You do not have permission to save the default scoreboard.");
+                return true;
+            }
+            TeamProvider<Plugin> t = scoreboard.getTeamProvider();
+            if (t == null) {
+                getConfig().set("defaults.teams", null);
+            } else {
+                getConfig().set("defaults.teams", t.getPlugin().getName() + '.' + t.getName());
+            }
+            for (DisplaySlot slot : DisplaySlot.values()) {
+                ObjectiveProvider<Plugin> o = scoreboard.getDisplayObjectiveProvider(slot);
+                if (o == null) {
+                    getConfig().set("defaults." + slot.name().toLowerCase(), null);
+                } else {
+                    getConfig().set("defaults." + slot.name().toLowerCase(), o.getPlugin().getName() + '.' + o.getName());
+                }
+            }
+            saveConfig();
+        } else if ("reset".equalsIgnoreCase(args[0])) {
+            if (args.length != 1) {
+                return false;
+            }
+            reset((Player)sender);
+        } else if ("resetall".equalsIgnoreCase(args[0])) {
+            if (args.length != 1) {
+                return false;
+            }
+            if (!sender.hasPermission("scoreshare.resetall")) {
+                sender.sendMessage("You do not have permission to reset everybody's scoreboard");
+                return true;
+            }
+            reset();
+        } else {
+            return false;
         }
         return true;
     }
@@ -206,8 +310,8 @@ public class ScoreShare extends JavaPlugin implements Listener {
     public List<ObjectiveProviderFactory<Plugin>> getObjectiveProviderFactories() {
         if (objectiveProviderFactories == null) {
             objectiveProviderFactories = new ArrayList<ObjectiveProviderFactory<Plugin>>();
-            for (RegisteredServiceProvider<ObjectiveProviderFactory> rsp :
-                    getServer().getServicesManager().getRegistrations(ObjectiveProviderFactory.class)) {
+            for (RegisteredServiceProvider<ObjectiveProviderFactory> rsp
+                    : getServer().getServicesManager().getRegistrations(ObjectiveProviderFactory.class)) {
                 objectiveProviderFactories.add(rsp.getProvider());
             }
         }
@@ -217,31 +321,29 @@ public class ScoreShare extends JavaPlugin implements Listener {
     public List<TeamProviderFactory<Plugin>> getTeamProviderFactories() {
         if (teamProviderFactories == null) {
             teamProviderFactories = new ArrayList<TeamProviderFactory<Plugin>>();
-            for (RegisteredServiceProvider<TeamProviderFactory> rsp :
-                    getServer().getServicesManager().getRegistrations(TeamProviderFactory.class)) {
+            for (RegisteredServiceProvider<TeamProviderFactory> rsp
+                    : getServer().getServicesManager().getRegistrations(TeamProviderFactory.class)) {
                 teamProviderFactories.add(rsp.getProvider());
             }
         }
         return teamProviderFactories;
     }
-    
 
     private class PlayerScoreboard {
 
         private final Scoreboard scoreboard;
         private final List<ObjectiveProvider<Plugin>> objectiveProviders;
         private final List<TeamProvider<Plugin>> teamProviders;
-
-        private final Map<DisplaySlot, ObjectiveProvider> displayObjectiveProviders = 
+        private final Map<DisplaySlot, ObjectiveProvider> displayObjectiveProviders =
                 new EnumMap<DisplaySlot, ObjectiveProvider>(DisplaySlot.class);
-        private Map<DisplaySlot, ObjectiveProviderListener> displayObjectiveProviderListeners = 
+        private Map<DisplaySlot, ObjectiveProviderListener> displayObjectiveProviderListeners =
                 new EnumMap<DisplaySlot, ObjectiveProviderListener>(DisplaySlot.class);
+
         {
             for (DisplaySlot displaySlot : DisplaySlot.values()) {
                 displayObjectiveProviderListeners.put(displaySlot, new ObjectiveProviderListenerImpl(displaySlot));
             }
         }
-
         private TeamProvider teamProvider = null;
         private TeamProviderListener teamProviderListener = new TeamProviderListenerImpl();
 
@@ -255,15 +357,14 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 }
             }
             Collections.sort(objectiveProviders, new Comparator<ObjectiveProvider>() {
-
                 @Override
                 public int compare(ObjectiveProvider o1, ObjectiveProvider o2) {
                     int result = o1.getPlugin().getName().toLowerCase().compareTo(o2.getPlugin().getName().toLowerCase());
-                    if (result != 0)
+                    if (result != 0) {
                         return result;
+                    }
                     return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
                 }
-
             });
             teamProviders = new ArrayList<TeamProvider<Plugin>>();
             for (TeamProviderFactory teamProviderFactory : getTeamProviderFactories()) {
@@ -273,12 +374,12 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 }
             }
             Collections.sort(teamProviders, new Comparator<TeamProvider>() {
-
                 @Override
                 public int compare(TeamProvider o1, TeamProvider o2) {
                     int result = o1.getPlugin().getName().toLowerCase().compareTo(o2.getPlugin().getName().toLowerCase());
-                    if (result != 0)
+                    if (result != 0) {
                         return result;
+                    }
                     return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
                 }
             });
@@ -293,9 +394,27 @@ public class ScoreShare extends JavaPlugin implements Listener {
             return objectiveProviders;
         }
 
+        public TeamProvider<Plugin> getTeamProvider(Plugin plugin, String name) {
+            for (TeamProvider<Plugin> t : teamProviders) {
+                if (plugin == t.getPlugin() && name.equals(t.getName())) {
+                    return t;
+                }
+            }
+            return null;
+        }
+
         public TeamProvider<Plugin> getTeamProvider(String provider) {
             for (TeamProvider<Plugin> t : teamProviders) {
                 if (provider.equalsIgnoreCase(t.getPlugin().getName() + '.' + t.getName())) {
+                    return t;
+                }
+            }
+            return null;
+        }
+
+        public ObjectiveProvider<Plugin> getObjectiveProvider(Plugin plugin, String name) {
+            for (ObjectiveProvider<Plugin> t : objectiveProviders) {
+                if (plugin == t.getPlugin() && name.equals(t.getName())) {
                     return t;
                 }
             }
@@ -310,7 +429,6 @@ public class ScoreShare extends JavaPlugin implements Listener {
             }
             return null;
         }
-
 
         public TeamProvider getTeamProvider() {
             return teamProvider;
@@ -379,6 +497,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         }
 
         private class ObjectiveProviderListenerImpl implements ObjectiveProviderListener {
+
             private final DisplaySlot displaySlot;
 
             public ObjectiveProviderListenerImpl(DisplaySlot displaySlot) {
@@ -395,8 +514,12 @@ public class ScoreShare extends JavaPlugin implements Listener {
 
             @Override
             public void removeScore(OfflinePlayer player) {
-                Objective objective = scoreboard.getObjective(displaySlot);
-                objective.getScore(player).reset();
+                if (bukkitSucks) {
+                    CBShim.createShim(ScoreModifier.class, ScoreShare.this).reset(scoreboard, displaySlot, player);
+                } else {
+                    Objective objective = scoreboard.getObjective(displaySlot);
+                    scoreboard.resetScores(player);
+                }
             }
         }
 

@@ -18,10 +18,10 @@ import org.bukkit.entity.Player;
  */
 class ServerStatsProvider extends AbstractObjectiveProvider<ScoreShare> implements ObjectiveProviderFactory<ScoreShare> {
     private static final int MB = 1024 * 1024;
-    private static final long DELAY = 20 * 30; // 30 seconds.
 
     public ServerStatsProvider(ScoreShare scoreShare) {
         super(scoreShare, "serverStats", "Server Statistics", "dummy");
+        int delay = getPlugin().getConfig().getInt("objectives.serverstats.delay", 100);
         getPlugin().getServer().getScheduler().runTaskTimer(getPlugin(), new Runnable() {
 
             @Override
@@ -30,7 +30,7 @@ class ServerStatsProvider extends AbstractObjectiveProvider<ScoreShare> implemen
                     firePutScore(e.getKey(), e.getValue());
                 }
             }
-        }, DELAY, DELAY);
+        }, delay, delay);
     }
 
     @Override
@@ -48,7 +48,7 @@ class ServerStatsProvider extends AbstractObjectiveProvider<ScoreShare> implemen
 
     @Override
     public ObjectiveProvider<ScoreShare> getProvider(Player player) {
-        if (player.hasPermission("scoreshare.objective.serverStats")) {
+        if (player.hasPermission("scoreshare.objective.serverstats")) {
             return this;
         } else {
             return null;

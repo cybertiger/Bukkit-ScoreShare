@@ -6,4 +6,4 @@ commands:
   scoreshare:
     description: Manipulate the shared scoreboard.
     usage: /<command> info | teams <team provider> | sidebar <objective provider> | nametag <objective provider> | list <objective provider>
-    permission: scoreshare.player.modify
+    permission: scoreshare.modify

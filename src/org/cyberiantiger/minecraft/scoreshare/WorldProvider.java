@@ -9,10 +9,13 @@ import org.cyberiantiger.minecraft.scoreshare.api.TeamProvider;
 import org.cyberiantiger.minecraft.scoreshare.api.Team;
 import org.cyberiantiger.minecraft.scoreshare.api.AbstractTeamProvider;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,55 +33,72 @@ import org.bukkit.event.world.WorldUnloadEvent;
  * @author antony
  */
 class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProviderFactory<ScoreShare>, Listener {
+    private Map<String, Team> worldTeams = new HashMap<String, Team>();
 
     public WorldProvider(ScoreShare scoreShare) {
         super(scoreShare, "worlds");
+        ConfigurationSection config = getPlugin().getConfig().getConfigurationSection("teams.world");
+        for (String s : config.getKeys(false)) {
+            ConfigurationSection teamConfig = config.getConfigurationSection(s);
+            Team team = new Team(s);
+            team.setDisplayName(teamConfig.getString("display", s));
+            team.setPrefix(teamConfig.getString("prefix", ""));
+            team.setSuffix(teamConfig.getString("suffix", ""));
+            worldTeams.put(s, team);
+        }
         getPlugin().getServer().getPluginManager().registerEvents(this, scoreShare);
     }
 
     @Override
     public Collection<Team> getTeams() {
-        Map<String, Team> teams = new HashMap<String, Team>();
-        for (World w : getPlugin().getServer().getWorlds()) {
-            Team team = new Team(w.getName());
-            teams.put(w.getName(), team);
-            team.setPrefix('[' + StringUtil.clampSize(w.getName(),14) + ']');
+        for (Team team : worldTeams.values()) {
+            team.setMembers(Collections.<OfflinePlayer>emptySet());
         }
         for (Player p : getPlugin().getServer().getOnlinePlayers()) {
-            Team team = teams.get(p.getWorld().getName());
-            team.addMember(p);
+            Team team = worldTeams.get(p.getWorld().getName());
+            if (team != null) {
+                team.addMember(p);
+            }
         }
-        return teams.values();
+        return worldTeams.values();
     }
 
     @Override
     public TeamProvider<ScoreShare> getTeamProvider(Player player) {
-        return this;
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onWorldLoad(WorldLoadEvent e) {
-        World newWorld = e.getWorld();
-        fireAddTeam(newWorld.getName());
-        fireModifyTeamPrefix(newWorld.getName(), '[' + StringUtil.clampSize(newWorld.getName(), 14) + ']');
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onWorldUnload(WorldUnloadEvent e) {
-        World oldWorld = e.getWorld();
-        fireRemoveTeam(oldWorld.getName());
+        if (player.hasPermission("scoreshare.teams.worlds")) {
+            return this;
+        } else {
+            return null;
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        fireAddTeamMember(player.getWorld().getName(), player);
+        Team team = worldTeams.get(player.getWorld().getName());
+        if (team != null) {
+            fireAddTeamMember(player.getWorld().getName(), player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        fireRemoveTeamMember(player.getWorld().getName(), player);
+        Team team = worldTeams.get(player.getWorld().getName());
+        if (team != null) {
+            fireRemoveTeamMember(player.getWorld().getName(), player);
+        }
+    }
+
+    private void changedWorld(World from, World to, Player player) {
+        Team team = worldTeams.get(from.getName());
+        if (team != null) {
+            fireRemoveTeamMember(team.getName(), player);
+        }
+        team = worldTeams.get(to.getName());
+        if (team != null) {
+            fireAddTeamMember(team.getName(), player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -89,8 +109,7 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
         if (from.getWorld() == to.getWorld()) {
             return;
         }
-        fireRemoveTeamMember(from.getWorld().getName(), player);
-        fireAddTeamMember(to.getWorld().getName(), player);
+        changedWorld(from.getWorld(), to.getWorld(), player);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -101,8 +120,7 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
         if (from.getWorld() == to.getWorld()) {
             return;
         }
-        fireRemoveTeamMember(from.getWorld().getName(), player);
-        fireAddTeamMember(to.getWorld().getName(), player);
+        changedWorld(from.getWorld(), to.getWorld(), player);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -117,8 +135,7 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
 
             @Override
             public void run() {
-                fireRemoveTeamMember(from.getWorld().getName(), player);
-                fireAddTeamMember(to.getWorld().getName(), player);
+                changedWorld(from.getWorld(), to.getWorld(), player);
             }
         });
     }

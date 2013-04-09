@@ -39,7 +39,11 @@ class HealthProvider extends AbstractObjectiveProvider<ScoreShare> implements Ob
 
     @Override
     public ObjectiveProvider<ScoreShare> getProvider(Player player) {
-        return this;
+        if (player.hasPermission("scoreshare.objective.health")) {
+            return this;
+        } else {
+            return null;
+        }
     }
 
     @EventHandler

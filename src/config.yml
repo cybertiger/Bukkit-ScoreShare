@@ -1,0 +1,22 @@
+teams:
+    world:
+        world:
+            display: 'World'
+            prefix: '§2'
+            suffix: ''
+        world_nether:
+            display: 'Nether'
+            prefix: '§4'
+            suffix: ''
+        world_the_end:
+            display: 'The End'
+            prefix: '§1'
+            suffix: ''
+objectives:
+    serverstats:
+        update: 100
+defaults:
+    teams: 'ScoreShare.worlds'
+    below_name:
+    player_list: 
+    sidebar: 'ScoreShare.serverStats'
