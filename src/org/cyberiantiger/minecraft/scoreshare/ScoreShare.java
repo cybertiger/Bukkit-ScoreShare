@@ -589,7 +589,6 @@ public class ScoreShare extends JavaPlugin implements Listener {
             public void addTeamMember(String teamName, OfflinePlayer member) {
                 org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
                 if (team != null) {
-                    System.out.println("Adding " + member.getName() + " to team " + teamName);
                     team.addPlayer(member);
                 }
             }
@@ -598,7 +597,6 @@ public class ScoreShare extends JavaPlugin implements Listener {
             public void removeTeamMember(String teamName, OfflinePlayer member) {
                 org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
                 if (team != null) {
-                    System.out.println("Removing " + member.getName() + " from team " + teamName);
                     team.removePlayer(member);
                 }
             }
