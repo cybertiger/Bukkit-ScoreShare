@@ -41,9 +41,19 @@ import org.cyberiantiger.minecraft.scoreshare.unsafe.CBShim;
 import org.cyberiantiger.minecraft.scoreshare.unsafe.ScoreModifier;
 
 /**
+ * The plugin class.
+ * <p>
+ * <b>Do not link against this class.</b>
+ * <p>
+ * To access the API use:
+ * <pre><code>getServer().getServicesManager().getRegistrations(TeamProviderFactory.class)</code></pre>
+ * <p>
+ * To add your own teams to the scoreboard use {@link TeamProviderFactory}.
+ * <p>
+ * To add your own objectives to the scoreboard use {@link ObjectiveProviderFactory}.
  *
- *
- * @author antony
+ * @see TeamProviderFactory
+ * @see ObjectiveProviderFactory
  */
 public class ScoreShare extends JavaPlugin implements Listener {
 
@@ -90,10 +100,6 @@ public class ScoreShare extends JavaPlugin implements Listener {
         }
     };
 
-    public ScoreShareAPI getAPI() {
-        return api;
-    }
-
     private void reset() {
         for (Player p : getServer().getOnlinePlayers()) {
             reset(p);
@@ -121,7 +127,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         saveDefaultConfig();
         // Register our own providers.
         ServicesManager manager = getServer().getServicesManager();
-        manager.register(ScoreShareAPI.class, getAPI(), this, ServicePriority.Normal);
+        manager.register(ScoreShareAPI.class, api, this, ServicePriority.Normal);
         manager.register(ObjectiveProviderFactory.class, new HealthProvider(this), this, ServicePriority.Normal);
         manager.register(ObjectiveProviderFactory.class, new ServerStatsProvider(this), this, ServicePriority.Normal);
         manager.register(TeamProviderFactory.class, new WorldProvider(this), this, ServicePriority.Normal);
@@ -308,7 +314,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         scoreboard.dispose(e.getPlayer());
     }
 
-    public List<ObjectiveProviderFactory<Plugin>> getObjectiveProviderFactories() {
+    private List<ObjectiveProviderFactory<Plugin>> getObjectiveProviderFactories() {
         if (objectiveProviderFactories == null) {
             objectiveProviderFactories = new ArrayList<ObjectiveProviderFactory<Plugin>>();
             for (RegisteredServiceProvider<ObjectiveProviderFactory> rsp
@@ -319,7 +325,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
         return objectiveProviderFactories;
     }
 
-    public List<TeamProviderFactory<Plugin>> getTeamProviderFactories() {
+    private List<TeamProviderFactory<Plugin>> getTeamProviderFactories() {
         if (teamProviderFactories == null) {
             teamProviderFactories = new ArrayList<TeamProviderFactory<Plugin>>();
             for (RegisteredServiceProvider<TeamProviderFactory> rsp

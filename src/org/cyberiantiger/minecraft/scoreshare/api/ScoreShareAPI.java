@@ -9,7 +9,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.DisplaySlot;
 
 /**
- *
+ * API for manipulating player's scoreboards.
+ * 
+ * Subject to change in future.
+ * 
  * @author antony
  */
 public interface ScoreShareAPI {

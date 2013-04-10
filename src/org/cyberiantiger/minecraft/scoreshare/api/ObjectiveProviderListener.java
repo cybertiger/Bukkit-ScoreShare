@@ -7,7 +7,8 @@ package org.cyberiantiger.minecraft.scoreshare.api;
 import org.bukkit.OfflinePlayer;
 
 /**
- *
+ * ObjectiveProvider listener
+ * 
  * @author antony
  */
 public interface ObjectiveProviderListener {

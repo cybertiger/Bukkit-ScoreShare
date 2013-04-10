@@ -9,8 +9,6 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Factory for TeamProvider.
- * <p>
- * 
  *
  * @author antony
  */

@@ -5,5 +5,14 @@ load: STARTUP
 commands:
   scoreshare:
     description: Manipulate the shared scoreboard.
-    usage: /<command> info | teams <team provider> | sidebar <objective provider> | nametag <objective provider> | list <objective provider>
+    usage: |
+      /<command> <action> [<argument>]
+      info - Show current scoreboard layout and available teams and objectives.
+      teams none|<provider> - Set the team provider.
+      belowname none|<provider> - Set the objective provider to use below player names.
+      sidebar none|<provider> - Set the objective provider to use for the sidebar.
+      list none|<provider> - Set the objective provider to use in the player list.
+      savedefault - Save your current scoreboard as the server default.
+      reset - Reset your current configuration to the server default.
+      resetall - Reset all players configurations to the server default.
     permission: scoreshare.modify

@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 /**
- *
+ * Factory for ObjectiveProvider.
+ * 
  * @author antony
  */
 public interface ObjectiveProviderFactory<T extends Plugin> {

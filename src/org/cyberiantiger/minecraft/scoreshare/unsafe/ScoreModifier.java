@@ -9,7 +9,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
 /**
- *
+ * Not public API.
+ * 
  * @author antony
  */
 public interface ScoreModifier {

@@ -8,7 +8,7 @@ package org.cyberiantiger.minecraft.scoreshare;
  *
  * @author antony
  */
-public class StringUtil {
+class StringUtil {
 
     public static String clampSize(String s, int maxLength) {
         if (s.length() < maxLength) {

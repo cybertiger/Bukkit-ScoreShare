@@ -8,7 +8,8 @@ import java.util.Collection;
 import org.bukkit.plugin.Plugin;
 
 /**
- *
+ * Provider of teams.
+ * 
  * @author antony
  */
 public interface TeamProvider<T extends Plugin> {

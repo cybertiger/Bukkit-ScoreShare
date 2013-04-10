@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 /**

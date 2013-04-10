@@ -4,7 +4,6 @@
  */
 package org.cyberiantiger.minecraft.scoreshare.unsafe.v1_5_R2;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.EnumMap;
 import java.util.Map;
 import net.minecraft.server.v1_5_R2.ScoreboardObjective;
@@ -12,10 +11,10 @@ import net.minecraft.server.v1_5_R2.ScoreboardScore;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_5_R2.scoreboard.CraftScoreboard;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 /**
+ * Not public API.
  *
  * @author antony
  */

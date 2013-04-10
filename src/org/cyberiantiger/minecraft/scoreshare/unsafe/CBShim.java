@@ -13,7 +13,8 @@ import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
 /**
- *
+ * Not public API.
+ * 
  * @author antony
  */
 public class CBShim {
