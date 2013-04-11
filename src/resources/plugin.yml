@@ -1,5 +1,5 @@
 name: "ScoreShare"
-version: "1.0"
+version: "${project.version}"
 main: "org.cyberiantiger.minecraft.scoreshare.ScoreShare"
 load: STARTUP
 commands:
