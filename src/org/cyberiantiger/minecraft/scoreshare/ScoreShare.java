@@ -524,8 +524,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 if (bukkitSucks) {
                     CBShim.createShim(ScoreModifier.class, ScoreShare.this).reset(scoreboard, displaySlot, player);
                 } else {
-                    Objective objective = scoreboard.getObjective(displaySlot);
-                    scoreboard.resetScores(player);
+                    // scoreboard.getObjective(displaySlot).getScore(player).reset();
                 }
             }
         }
