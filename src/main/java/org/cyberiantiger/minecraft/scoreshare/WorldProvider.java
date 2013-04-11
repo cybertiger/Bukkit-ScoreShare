@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -50,12 +49,12 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
     @Override
     public Collection<Team> getTeams() {
         for (Team team : worldTeams.values()) {
-            team.setMembers(Collections.<OfflinePlayer>emptySet());
+            team.setMemberNames(Collections.<String>emptySet());
         }
         for (Player p : getPlugin().getServer().getOnlinePlayers()) {
             Team team = worldTeams.get(p.getWorld().getName());
             if (team != null) {
-                team.addMember(p);
+                team.addMemberName(p.getName());
             }
         }
         return worldTeams.values();
