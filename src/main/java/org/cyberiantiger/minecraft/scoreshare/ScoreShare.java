@@ -50,7 +50,8 @@ import org.cyberiantiger.minecraft.scoreshare.unsafe.ScoreModifier;
  * <p>
  * To add your own teams to the scoreboard use {@link TeamProviderFactory}.
  * <p>
- * To add your own objectives to the scoreboard use {@link ObjectiveProviderFactory}.
+ * To add your own objectives to the scoreboard use
+ * {@link ObjectiveProviderFactory}.
  *
  * @see TeamProviderFactory
  * @see ObjectiveProviderFactory
@@ -58,7 +59,6 @@ import org.cyberiantiger.minecraft.scoreshare.unsafe.ScoreModifier;
 public class ScoreShare extends JavaPlugin implements Listener {
 
     private final boolean bukkitSucks = true;
-
     private Map<Player, PlayerScoreboard> scoreboards = new WeakHashMap<Player, PlayerScoreboard>();
     private List<ObjectiveProviderFactory<Plugin>> objectiveProviderFactories;
     private List<TeamProviderFactory<Plugin>> teamProviderFactories;
@@ -287,7 +287,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 return false;
             }
-            reset((Player)sender);
+            reset((Player) sender);
         } else if ("resetall".equalsIgnoreCase(args[0])) {
             if (args.length != 1) {
                 return false;
@@ -480,7 +480,7 @@ public class ScoreShare extends JavaPlugin implements Listener {
             }
 
             if (objectiveProvider != null) {
-                Objective objective = scoreboard.registerNewObjective(slot.name(), objectiveProvider.getCriteria());
+                Objective objective = scoreboard.registerNewObjective(objectiveProvider.getName()+'_'+slot.name(), objectiveProvider.getCriteria());
                 displayObjectiveProviders.put(slot, objectiveProvider);
                 objectiveProvider.addListener(displayObjectiveProviderListeners.get(slot));
                 objective.setDisplaySlot(slot);
