@@ -74,7 +74,7 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
         Player player = e.getPlayer();
         Team team = worldTeams.get(player.getWorld().getName());
         if (team != null) {
-            fireAddTeamMember(player.getWorld().getName(), player);
+            fireAddTeamMember(player.getWorld().getName(), player.getName());
         }
     }
 
@@ -83,18 +83,18 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
         Player player = e.getPlayer();
         Team team = worldTeams.get(player.getWorld().getName());
         if (team != null) {
-            fireRemoveTeamMember(player.getWorld().getName(), player);
+            fireRemoveTeamMember(player.getWorld().getName(), player.getName());
         }
     }
 
     private void changedWorld(World from, World to, Player player) {
         Team team = worldTeams.get(from.getName());
         if (team != null) {
-            fireRemoveTeamMember(team.getName(), player);
+            fireRemoveTeamMember(team.getName(), player.getName());
         }
         team = worldTeams.get(to.getName());
         if (team != null) {
-            fireAddTeamMember(team.getName(), player);
+            fireAddTeamMember(team.getName(), player.getName());
         }
     }
 
@@ -136,5 +136,4 @@ class WorldProvider extends AbstractTeamProvider<ScoreShare> implements TeamProv
             }
         });
     }
-
 }

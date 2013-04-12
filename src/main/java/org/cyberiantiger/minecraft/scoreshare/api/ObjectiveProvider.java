@@ -5,7 +5,6 @@
 package org.cyberiantiger.minecraft.scoreshare.api;
 
 import java.util.Map;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -48,7 +47,7 @@ public interface ObjectiveProvider<T extends Plugin> {
      * 
      * @return A map of player to score.
      */
-    public Map<OfflinePlayer, Integer> getScores();
+    public Map<String, Integer> getScores();
 
     /**
      * Add a listener to this ObjectiveProvider to be notified of any changes.

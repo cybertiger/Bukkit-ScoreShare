@@ -7,7 +7,6 @@ package org.cyberiantiger.minecraft.scoreshare.api;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -135,7 +134,7 @@ public abstract class AbstractTeamProvider<T extends Plugin> implements TeamProv
      * @param teamName name of team to add member to
      * @param member member to add to team
      */
-    protected void fireAddTeamMember(String teamName, OfflinePlayer member) {
+    protected void fireAddTeamMember(String teamName, String member) {
         for (TeamProviderListener listener : listeners) {
             listener.addTeamMember(teamName, member);
         }
@@ -147,7 +146,7 @@ public abstract class AbstractTeamProvider<T extends Plugin> implements TeamProv
      * @param teamName name of team to remove member from
      * @param member member to remove from team
      */
-    protected void fireRemoveTeamMember(String teamName, OfflinePlayer member) {
+    protected void fireRemoveTeamMember(String teamName, String member) {
         for (TeamProviderListener listener : listeners) {
             listener.removeTeamMember(teamName, member);
         }

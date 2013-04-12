@@ -9,7 +9,6 @@ import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProvider;
 import org.cyberiantiger.minecraft.scoreshare.api.AbstractObjectiveProvider;
 import java.util.HashMap;
 import java.util.Map;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -26,7 +25,7 @@ class ServerStatsProvider extends AbstractObjectiveProvider<ScoreShare> implemen
 
             @Override
             public void run() {
-                for (Map.Entry<OfflinePlayer, Integer> e : getScores().entrySet()) {
+                for (Map.Entry<String, Integer> e : getScores().entrySet()) {
                     firePutScore(e.getKey(), e.getValue());
                 }
             }
@@ -34,15 +33,12 @@ class ServerStatsProvider extends AbstractObjectiveProvider<ScoreShare> implemen
     }
 
     @Override
-    public Map<OfflinePlayer, Integer> getScores() {
-        OfflinePlayer totalMemory = getPlugin().getServer().getOfflinePlayer("Total Memory");
-        OfflinePlayer freeMemory = getPlugin().getServer().getOfflinePlayer("Free Memory");
-        OfflinePlayer maxMemory = getPlugin().getServer().getOfflinePlayer("Max Memory");
+    public Map<String, Integer> getScores() {
 
-        Map<OfflinePlayer, Integer> result = new HashMap<OfflinePlayer, Integer>();
-        result.put(totalMemory, (int) (Runtime.getRuntime().totalMemory() / MB));
-        result.put(maxMemory, (int) (Runtime.getRuntime().maxMemory() / MB));
-        result.put(freeMemory, (int) (Runtime.getRuntime().freeMemory() / MB));
+        Map<String, Integer> result = new HashMap<String, Integer>();
+        result.put("Total Memory", (int) (Runtime.getRuntime().totalMemory() / MB));
+        result.put("Max Memory", (int) (Runtime.getRuntime().maxMemory() / MB));
+        result.put("Free Memory", (int) (Runtime.getRuntime().freeMemory() / MB));
         return result;
     }
 

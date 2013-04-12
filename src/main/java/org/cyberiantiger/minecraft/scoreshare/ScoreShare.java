@@ -485,9 +485,9 @@ public class ScoreShare extends JavaPlugin implements Listener {
                 objectiveProvider.addListener(displayObjectiveProviderListeners.get(slot));
                 objective.setDisplaySlot(slot);
                 objective.setDisplayName(objectiveProvider.getDisplayName());
-                Map<OfflinePlayer, Integer> initialScores = objectiveProvider.getScores();
-                for (Map.Entry<OfflinePlayer, Integer> e : initialScores.entrySet()) {
-                    objective.getScore(e.getKey()).setScore(e.getValue());
+                Map<String, Integer> initialScores = objectiveProvider.getScores();
+                for (Map.Entry<String, Integer> e : initialScores.entrySet()) {
+                    objective.getScore(getServer().getOfflinePlayer(e.getKey())).setScore(e.getValue());
                 }
             }
         }
@@ -512,17 +512,17 @@ public class ScoreShare extends JavaPlugin implements Listener {
             }
 
             @Override
-            public void putScore(OfflinePlayer player, int score) {
+            public void putScore(String player, int score) {
                 Objective objective = scoreboard.getObjective(displaySlot);
                 if (objective != null) {
-                    objective.getScore(player).setScore(score);
+                    objective.getScore(getServer().getOfflinePlayer(player)).setScore(score);
                 }
             }
 
             @Override
-            public void removeScore(OfflinePlayer player) {
+            public void removeScore(String player) {
                 if (bukkitSucks) {
-                    CBShim.createShim(ScoreModifier.class, ScoreShare.this).reset(scoreboard, displaySlot, player);
+                    CBShim.createShim(ScoreModifier.class, ScoreShare.this).reset(scoreboard, displaySlot, getServer().getOfflinePlayer(player));
                 } else {
                     // scoreboard.getObjective(displaySlot).getScore(player).reset();
                 }
@@ -585,31 +585,31 @@ public class ScoreShare extends JavaPlugin implements Listener {
             }
 
             @Override
-            public void addTeamMember(String teamName, OfflinePlayer member) {
+            public void addTeamMember(String teamName, String member) {
                 org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
                 if (team != null) {
-                    team.addPlayer(member);
+                    team.addPlayer(getServer().getOfflinePlayer(member));
                 }
             }
 
             @Override
-            public void removeTeamMember(String teamName, OfflinePlayer member) {
+            public void removeTeamMember(String teamName, String member) {
                 org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
                 if (team != null) {
-                    team.removePlayer(member);
+                    team.removePlayer(getServer().getOfflinePlayer(member));
                 }
             }
         }
     }
 
-    private static void copy(org.cyberiantiger.minecraft.scoreshare.api.Team myTeam, org.bukkit.scoreboard.Team team) {
+    private void copy(org.cyberiantiger.minecraft.scoreshare.api.Team myTeam, org.bukkit.scoreboard.Team team) {
         team.setDisplayName(myTeam.getDisplayName());
         team.setPrefix(myTeam.getPrefix());
         team.setSuffix(myTeam.getSuffix());
         team.setAllowFriendlyFire(myTeam.isFriendlyFire());
         team.setCanSeeFriendlyInvisibles(myTeam.isSeeInvisibleFriendlies());
-        for (OfflinePlayer p : myTeam.getMembers()) {
-            team.addPlayer(p);
+        for (String p : myTeam.getMemberNames()) {
+            team.addPlayer(getServer().getOfflinePlayer(p));
         }
     }
 }

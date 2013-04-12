@@ -4,8 +4,6 @@
  */
 package org.cyberiantiger.minecraft.scoreshare.api;
 
-import org.bukkit.OfflinePlayer;
-
 /**
  * A listener for a TeamProvider.
  * 
@@ -72,7 +70,7 @@ public interface TeamProviderListener {
      * @param team the team
      * @param member the new member
      */
-    public void addTeamMember(String team, OfflinePlayer member);
+    public void addTeamMember(String team, String member);
 
     /**
      * Receive notification that a team member has been removed.
@@ -80,5 +78,5 @@ public interface TeamProviderListener {
      * @param team the team
      * @param member the removed member
      */
-    public void removeTeamMember(String team, OfflinePlayer member);
+    public void removeTeamMember(String team, String member);
 }

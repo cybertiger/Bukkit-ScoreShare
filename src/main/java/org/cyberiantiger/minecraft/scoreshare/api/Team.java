@@ -7,7 +7,6 @@ package org.cyberiantiger.minecraft.scoreshare.api;
 import java.util.HashSet;
 import java.util.Set;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 /**
  * A concrete class to represent a Team.
@@ -95,53 +94,6 @@ public final class Team {
      */
     public void removeMemberName(String name) {
         this.members.remove(name);
-    }
-
-    /**
-     * Gets the members of the team.
-     * 
-     * @return the members of the team
-     * @deprecated
-     */
-    public Set<OfflinePlayer> getMembers() {
-        Set<OfflinePlayer> ret = new HashSet<OfflinePlayer>(members.size());
-        for (String member : members) {
-            ret.add(Bukkit.getServer().getOfflinePlayer(member));
-        }
-        return ret;
-    }
-
-    /**
-     * Sets the members of the team.
-     * 
-     * @param members the members of the team
-     * @deprecated
-     */
-    public void setMembers(Set<OfflinePlayer> members) {
-        this.members.clear();
-        for (OfflinePlayer player : members) {
-            addMember(player);
-        }
-    }
-
-    /**
-     * Adds a member to the team.
-     * 
-     * @param player member to add
-     * @deprecated
-     */
-    public void addMember(OfflinePlayer player) {
-        this.members.add(player.getName());
-    }
-
-    /**
-     * Removes a member from the team.
-     * 
-     * @param player member to remove
-     * @deprecated
-     */
-    public void removeMember(OfflinePlayer player) {
-        this.members.remove(player.getName());
     }
 
     /**

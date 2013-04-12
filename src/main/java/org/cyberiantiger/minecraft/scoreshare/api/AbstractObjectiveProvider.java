@@ -7,7 +7,6 @@ package org.cyberiantiger.minecraft.scoreshare.api;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -72,7 +71,7 @@ public abstract class AbstractObjectiveProvider<T extends Plugin> implements Obj
      * @param player the player to update the score for
      * @param score the new score
      */
-    protected void firePutScore(OfflinePlayer player, int score) {
+    protected void firePutScore(String player, int score) {
         for (ObjectiveProviderListener listener : listeners) {
             listener.putScore(player, score);
         }
@@ -83,7 +82,7 @@ public abstract class AbstractObjectiveProvider<T extends Plugin> implements Obj
      * 
      * @param player the player to remove the score from
      */
-    protected void fireRemoveScore(OfflinePlayer player) {
+    protected void fireRemoveScore(String player) {
         for (ObjectiveProviderListener listener : listeners) {
             listener.removeScore(player);
         }

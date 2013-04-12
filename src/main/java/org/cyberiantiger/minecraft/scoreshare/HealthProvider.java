@@ -9,7 +9,6 @@ import org.cyberiantiger.minecraft.scoreshare.api.ObjectiveProvider;
 import org.cyberiantiger.minecraft.scoreshare.api.AbstractObjectiveProvider;
 import java.util.HashMap;
 import java.util.Map;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,10 +28,10 @@ class HealthProvider extends AbstractObjectiveProvider<ScoreShare> implements Ob
     }
 
     @Override
-    public Map<OfflinePlayer, Integer> getScores() {
-        Map<OfflinePlayer, Integer> ret = new HashMap<OfflinePlayer, Integer>();
+    public Map<String, Integer> getScores() {
+        Map<String, Integer> ret = new HashMap<String, Integer>();
         for (Player p : getPlugin().getServer().getOnlinePlayers()) {
-            ret.put(p, p.getHealth());
+            ret.put(p.getName(), p.getHealth());
         }
         return ret;
     }
@@ -48,11 +47,11 @@ class HealthProvider extends AbstractObjectiveProvider<ScoreShare> implements Ob
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        firePutScore(e.getPlayer(), e.getPlayer().getHealth());
+        firePutScore(e.getPlayer().getName(), e.getPlayer().getHealth());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        fireRemoveScore(e.getPlayer());
+        fireRemoveScore(e.getPlayer().getName());
     }
 }
