@@ -48,7 +48,7 @@
   	<dependency>
   		<groupId>org.bukkit</groupId>
   		<artifactId>craftbukkit</artifactId>
-  		<version>1.5.1-R0.2-cyberiantiger</version>
+  		<version>1.5.1-R0.2</version>
   	</dependency>
   </dependencies>
   <distributionManagement>
